@@ -7,6 +7,7 @@ export default async ({ req, res, log, error }) => {
 
     // Destructure the required fields from req.body
     const { accessKey, secretKey, bucketName } = req.body;
+    log(accessKey,secretKey,bucketName)
 
     // Validate input
     if (!accessKey || !secretKey || !bucketName) {

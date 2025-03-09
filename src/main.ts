@@ -2,6 +2,7 @@ import { S3Client, ListBucketsCommand } from "@aws-sdk/client-s3";
 
 export default async ({ req, res, log, error }) => {
   try {
+    log(JSON.parse(req.body))
     const { accessKey, secretKey, bucketName } = JSON.parse(req.body);
 
     // Validate input

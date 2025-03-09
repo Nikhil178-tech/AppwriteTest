@@ -2,12 +2,18 @@ import { S3Client, ListBucketsCommand } from "@aws-sdk/client-s3";
 
 export default async ({ req, res, log, error }) => {
   try {
-    // Debugging: Log the request body to inspect its structure
-    log("Request Body:", req.body);
+    // Debugging: Log the raw request body to inspect its structure
+    log("Raw Request Body:", req.body);
 
-    // Destructure the required fields from req.body
-    const { accessKey, secretKey, bucketName } = req.body;
-    log(accessKey,secretKey,bucketName)
+    // Parse the request body as JSON
+    const body = JSON.parse(req.body);
+    log("Parsed Request Body:", body);
+
+    // Destructure the required fields from the parsed body
+    const { accessKey, secretKey, bucketName } = body;
+    log("Access Key:", accessKey);
+    log("Secret Key:", secretKey);
+    log("Bucket Name:", bucketName);
 
     // Validate input
     if (!accessKey || !secretKey || !bucketName) {

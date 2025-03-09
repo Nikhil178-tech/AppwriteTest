@@ -2,23 +2,20 @@ import { S3Client, ListBucketsCommand } from "@aws-sdk/client-s3";
 
 export default async ({ req, res, log, error }) => {
   try {
+    // Debugging: Log the request body to inspect its structure
+    log("Request Body:", req.body);
 
-    const data = JSON.stringify(req.body)
-    const parsedData = JSON.parse(data)
-    log(data,parsedData.accessKey); // Debugging: Check the request body structure
-    log(parsedData.secretKey)
-    
+    // Destructure the required fields from req.body
+    const { accessKey, secretKey, bucketName } = req.body;
 
-    const { accessKey, secretKey, bucketName } = req.body; // No need for JSON.parse
-    log(accessKey,secretKey,bucketName)
-
+    // Validate input
     if (!accessKey || !secretKey || !bucketName) {
       return res.json({ success: false, message: "Missing credentials" });
     }
 
     // Initialize S3 client
     const s3Client = new S3Client({
-      region: "us-east-1",
+      region: "us-east-1", // Replace with your AWS region
       credentials: {
         accessKeyId: accessKey,
         secretAccessKey: secretKey,
@@ -28,6 +25,7 @@ export default async ({ req, res, log, error }) => {
     // List buckets
     const response = await s3Client.send(new ListBucketsCommand({}));
 
+    // Check if the bucket exists
     const bucketExists = response.Buckets?.some(
       (bucket) => bucket.Name === bucketName
     );
@@ -36,6 +34,7 @@ export default async ({ req, res, log, error }) => {
       return res.json({ success: false, message: "Bucket not found" });
     }
 
+    // Return success response
     return res.json({
       success: true,
       steps: [
@@ -47,7 +46,8 @@ export default async ({ req, res, log, error }) => {
       response,
     });
   } catch (err) {
-    error(err.message);
+    // Log the error and return a failure response
+    error("Error:", err.message);
     return res.json({ success: false, message: err.message });
   }
 };

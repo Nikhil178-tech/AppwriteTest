@@ -4,7 +4,7 @@ export default async ({ req, res, log, error }) => {
   try {
 
     const data = JSON.stringify(req.body)
-    log(data,JSON.parse(data).accessKey); // Debugging: Check the request body structure
+    log(data,JSON.parse(data)); // Debugging: Check the request body structure
     
 
     const { accessKey, secretKey, bucketName } = req.body; // No need for JSON.parse

@@ -1,5 +1,6 @@
 import { Client, Users } from "node-appwrite";
 
+
 // This Appwrite function will be executed every time your function is triggered
 export default async ({ req, res, log, error }: any) => {
   // You can use the Appwrite SDK to interact with other services
@@ -25,7 +26,7 @@ export default async ({ req, res, log, error }: any) => {
     // Don't forget to return a response!
     return res.text("Pong");
   }
-
+    
   return res.json({
     motto: "Build like a team of hundreds_",
     learn: "https://appwrite.io/docs",

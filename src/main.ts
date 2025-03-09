@@ -15,8 +15,8 @@ export default async ({ req, res, log, error }) => {
     log("Secret Key:", secretKey);
     log("Bucket Name:", bucketName);
 
-    // Validate input
-    if (!accessKey || !secretKey || !bucketName) {
+    // Validate input (only accessKey and secretKey are required)
+    if (!accessKey || !secretKey) {
       return res.json({ success: false, message: "Missing credentials" });
     }
 
@@ -32,13 +32,15 @@ export default async ({ req, res, log, error }) => {
     // List buckets
     const response = await s3Client.send(new ListBucketsCommand({}));
 
-    // Check if the bucket exists
-    const bucketExists = response.Buckets?.some(
-      (bucket) => bucket.Name === bucketName
-    );
+    // If bucketName is provided, check if it exists
+    if (bucketName) {
+      const bucketExists = response.Buckets?.some(
+        (bucket) => bucket.Name === bucketName
+      );
 
-    if (!bucketExists) {
-      return res.json({ success: false, message: "Bucket not found" });
+      if (!bucketExists) {
+        return res.json({ success: false, message: "Bucket not found" });
+      }
     }
 
     // Return success response

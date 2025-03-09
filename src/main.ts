@@ -5,6 +5,7 @@ export default async ({ req, res, log, error }) => {
     log(req.body); // Debugging: Check the request body structure
 
     const { accessKey, secretKey, bucketName } = req.body; // No need for JSON.parse
+    log(accessKey,secretKey,bucketName)
 
     if (!accessKey || !secretKey || !bucketName) {
       return res.json({ success: false, message: "Missing credentials" });

@@ -1,36 +1,48 @@
-import { Client, Users } from "node-appwrite";
+import { S3Client, ListBucketsCommand } from "@aws-sdk/client-s3";
 
-
-// This Appwrite function will be executed every time your function is triggered
-export default async ({ req, res, log, error }: any) => {
-  // You can use the Appwrite SDK to interact with other services
-  // For this example, we're using the Users service
-  const client = new Client()
-    .setEndpoint(Bun.env["APPWRITE_FUNCTION_API_ENDPOINT"])
-    .setProject(Bun.env["APPWRITE_FUNCTION_PROJECT_ID"])
-    .setKey(req.headers['x-appwrite-key'] ?? '');
-  const users = new Users(client);
-
+export default async ({ req, res, log, error }) => {
   try {
-    const response = await users.list();
-    // Log messages and errors to the Appwrite Console
-    // These logs won't be seen by your end users
-    log(`Total users: ${response.total}`);
-  } catch(err) {
-    error("Could not list users: " + err.message);
-  }
+    const { accessKey, secretKey, bucketName } = JSON.parse(req.body);
 
-  // The req object contains the request data
-  if (req.path === "/ping") {
-    // Use res object to respond with text(), json(), or binary()
-    // Don't forget to return a response!
-    return res.text("Pong");
-  }
+    // Validate input
+    if (!accessKey || !secretKey || !bucketName) {
+      return res.json({ success: false, message: "Missing credentials" });
+    }
+
+    // Initialize S3 client
+    const s3Client = new S3Client({
+      region: "us-east-1", // Replace with your AWS region
+      credentials: {
+        accessKeyId: accessKey,
+        secretAccessKey: secretKey,
+      },
+    });
+
+    // Test connection by listing buckets
+    const command = new ListBucketsCommand({});
+    const response = await s3Client.send(command);
     
-  return res.json({
-    motto: "Build like a team of hundreds_",
-    learn: "https://appwrite.io/docs",
-    connect: "https://appwrite.io/discord",
-    getInspired: "https://builtwith.appwrite.io",
-  });
+    
+
+    const bucketExists = response.Buckets?.some(
+      (bucket) => bucket.Name === bucketName
+    );
+
+    if (!bucketExists) {
+      return res.json({ success: false, message: "Bucket not found" });
+    }
+
+    // Simulate connection steps
+    const steps = [
+      { id: 1, label: "Validating credentials", completed: true },
+      { id: 2, label: "Establishing connection", completed: true },
+      { id: 3, label: "Testing permissions", completed: true },
+      { id: 4, label: "Finalizing setup", completed: true },
+    ];
+
+    return res.json({ success: true, steps,response });
+  } catch (err) {
+    error(err.message);
+    return res.json({ success: false, message: err.message });
+  }
 };
